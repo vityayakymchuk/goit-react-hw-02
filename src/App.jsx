@@ -1,35 +1,62 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
+import { useState } from 'react';
+import Description from '../src/components/Description/Description';
+import Options from '../src/components/Options/Options';
+import Feedback from '../src/components/Feedback/Feedback';
 
 function App() {
-  const [count, setCount] = useState(0)
+    const getData = localStorage.getItem('feedbackData');
+    const initialFeedbackData = getData ? JSON.parse(getData) : {
+        good: 0,
+        neutral: 0,
+        bad: 0
+    };
 
-  return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    const [feedbackType, setFeedbackType] = useState(
+        initialFeedbackData
+    );
+
+   
+
+
+
+
+
+   
+
+    const updateFeedback = (type) => {
+        setFeedbackType(prevState => ({
+            ...prevState,
+            [type]: prevState[type] + 1
+        }));
+    };
+
+    const totalFeedback = feedbackType.good + feedbackType.neutral + feedbackType.bad;
+    
+
+
+const resetFeedback = () => {setFeedbackType({
+        good: 0,
+        neutral: 0,
+        bad: 0
+    })}
+
+
+    localStorage.setItem('feedbackData', JSON.stringify(feedbackType));
+
+    return (<div>
+        <Description title='Sip Happens Café' description='Please leave your feedback about our service by selecting one of the options below.' />
+        <Options onClick={updateFeedback} reset={totalFeedback} onReset={resetFeedback} />
+        {totalFeedback>0 ? (<Feedback
+                good={feedbackType.good}
+                neutral={feedbackType.neutral}
+                bad={feedbackType.bad}
+                total={totalFeedback}
+    
+            />) : (<p style={{ fontSize: '25px', marginTop: '20px' }}>No feedback yet</p>)}
+        
+        </div>
+    )
 }
 
-export default App
+export default App;
