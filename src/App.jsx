@@ -6,6 +6,8 @@ import Feedback from '../src/components/Feedback/Feedback';
 import Notification from '../src/components/Notification/Notification';
 
 function App() {
+    const [feedbackType, setFeedbackType] = useState({ good: 0, neutral: 0, bad: 0 });
+
     useEffect(() => {
         const getData = localStorage.getItem('feedbackData');
         if (getData) {
@@ -19,23 +21,17 @@ function App() {
         }
     }, []);
 
-    const [feedbackType, setFeedbackType] = useState(null);
 
     const updateFeedback = (type) => {
-        setFeedbackType(prevState => ({
-            ...prevState,
-            [type]: prevState[type] + 1
-        }));
+        const updatedFeedback = { ...feedbackType, [type]: feedbackType[type] + 1 };
+        setFeedbackType(updatedFeedback);
+        localStorage.setItem('feedbackData', JSON.stringify(updatedFeedback));
     };
 
     const totalFeedback = feedbackType ? feedbackType.good + feedbackType.neutral + feedbackType.bad : 0;
 
     const resetFeedback = () => {
-        setFeedbackType({
-            good: 0,
-            neutral: 0,
-            bad: 0
-        });
+        setFeedbackType({ good: 0, neutral: 0, bad: 0 });
         localStorage.removeItem('feedbackData');
     };
 
@@ -45,12 +41,6 @@ function App() {
     } else {
         positive = Math.round((feedbackType?.good / (totalFeedback - feedbackType?.neutral)) * 100);
     }
-
-    useEffect(() => {
-        if (feedbackType) {
-            localStorage.setItem('feedbackData', JSON.stringify(feedbackType));
-        }
-    }, [feedbackType]);
 
     return (
         <div>
