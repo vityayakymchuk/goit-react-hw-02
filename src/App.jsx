@@ -6,26 +6,15 @@ import Feedback from '../src/components/Feedback/Feedback';
 import Notification from '../src/components/Notification/Notification';
 
 function App() {
-    const [feedbackType, setFeedbackType] = useState({ good: 0, neutral: 0, bad: 0 });
+    const getData = localStorage.getItem('feedbackData');
+    const initialGetData = getData ? JSON.parse(getData) : { good: 0, neutral: 0, bad: 0 };
 
-    useEffect(() => {
-        const getData = localStorage.getItem('feedbackData');
-        if (getData) {
-            setFeedbackType(JSON.parse(getData));
-        } else {
-            setFeedbackType({
-                good: 0,
-                neutral: 0,
-                bad: 0
-            });
-        }
-    }, []);
-
+    const [feedbackType, setFeedbackType] = useState(initialGetData);
 
     const updateFeedback = (type) => {
         const updatedFeedback = { ...feedbackType, [type]: feedbackType[type] + 1 };
         setFeedbackType(updatedFeedback);
-        localStorage.setItem('feedbackData', JSON.stringify(updatedFeedback));
+        
     };
 
     const totalFeedback = feedbackType ? feedbackType.good + feedbackType.neutral + feedbackType.bad : 0;
@@ -39,8 +28,10 @@ function App() {
     if (totalFeedback === 0 || feedbackType?.neutral === totalFeedback) {
         positive = 0;
     } else {
-        positive = Math.round((feedbackType?.good / (totalFeedback - feedbackType?.neutral)) * 100);
+        positive = Math.round((feedbackType?.good / totalFeedback) * 100);
     }
+
+    useEffect(() => {localStorage.setItem('feedbackData', JSON.stringify(feedbackType));}, [feedbackType])
 
     return (
         <div>
